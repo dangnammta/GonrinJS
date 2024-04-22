@@ -1941,7 +1941,6 @@
 		}
 	});
 
-	var collectionMap;
 	var collectionProps = ['page, numRows', 'filters'];
 
 	Gonrin.Collection = Backbone.Collection.extend({
@@ -1961,7 +1960,7 @@
     		this.totalPages = response.total_pages;
 			this.other_data = response.other_data;
 			var myStorage = window.sessionStorage;
-			if (!!myStorage){
+			if (!!myStorage && !!this.page){
 				myStorage.setItem(this.url+"_current_page", this.page);
 			}
 			return response.objects;
