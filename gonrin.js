@@ -1950,6 +1950,7 @@
 		totalPages: null,
 		numRows:null,
 		filters: null,
+		other_data: null,
 		constructor: function(attributes, options) {
 			_.extend(this, _.pick(options||{}, collectionProps));
 			_super(this, 'constructor', arguments);
@@ -1958,6 +1959,11 @@
     		this.page = response.page;
     		this.numRows = response.num_results;
     		this.totalPages = response.total_pages;
+			this.other_data = response.other_data;
+			var myStorage = window.sessionStorage;
+			if (!!myStorage){
+				myStorage.setItem(this.url+"_current_page", this.page);
+			}
 			return response.objects;
 		},
 	});
@@ -1965,8 +1971,13 @@
 	Gonrin.CollectionView = Gonrin.View.extend({
 		initModel: function(modelData){
         	this.collection = new Gonrin.Collection(Gonrin.Model);
-        	var serviceURL = this.getApp().serviceURL !== null? this.getApp().serviceURL :"" ;
-        	this.collection.url = serviceURL + this.urlPrefix + this.collectionName;
+			var serviceURL = this.getApp().serviceURL !== null? this.getApp().serviceURL :"" ;
+			if (!!this.domain){
+				this.collection.url = this.domain + this.urlPrefix + this.collectionName;
+			} else {
+				this.collection.url = serviceURL + this.urlPrefix + this.collectionName;
+			}
+        	
 	    },
 	    tools: [
       	    {
@@ -2130,8 +2141,12 @@
 				this.model = new Gonrin.Model(def,{modelData: modelData});
 			}
 			if(this.model.urlRoot == null){
-				var serviceURL = this.getApp().serviceURL !== null? this.getApp().serviceURL :"" ;
-				this.model.urlRoot = serviceURL + this.urlPrefix + this.collectionName;
+				if (!!this.domain && this.domain.length>0){
+					this.model.urlRoot = this.domain + this.urlPrefix + this.collectionName;
+				} else {
+					var serviceURL = this.getApp().serviceURL !== null? this.getApp().serviceURL :"" ;
+					this.model.urlRoot = serviceURL + this.urlPrefix + this.collectionName;
+				}
 			}
 			return this;
 		},
